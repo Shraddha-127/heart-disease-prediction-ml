@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | CardioAI{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <div class="welcome-banner glass-card">
+        <div>
+            <h1>Welcome, {{ user['fullname'] }} <i class="fa-solid fa-hand-sparkles"></i></h1>
+            <p>Here's a quick overview of your heart health activity.</p>
+        </div>
+        <a href="{{ url_for('predict') }}" class="btn-gradient quick-predict-btn">
+            <i class="fa-solid fa-heart-circle-check"></i> Quick Predict
+        </a>
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card glass-card" data-aos>
+            <div class="stat-icon icon-blue"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="stat-value counter" data-target="{{ total_predictions }}">0</div>
+            <div class="stat-label">Total Predictions</div>
+        </div>
+
+        <div class="stat-card glass-card" data-aos>
+            <div class="stat-icon icon-green"><i class="fa-solid fa-bullseye"></i></div>
+            <div class="stat-value counter" data-target="{{ model_accuracy }}" data-decimal="true">0</div>
+            <div class="stat-label">Model Accuracy (%)</div>
+        </div>
+
+        <div class="stat-card glass-card" data-aos>
+            <div class="stat-icon icon-purple"><i class="fa-solid fa-robot"></i></div>
+            <div class="stat-value">Random Forest</div>
+            <div class="stat-label">Current Model</div>
+        </div>
+
+        <div class="stat-card glass-card" data-aos>
+            <div class="stat-icon icon-cyan"><i class="fa-solid fa-lightbulb"></i></div>
+            <div class="stat-value">SHAP</div>
+            <div class="stat-label">Explainable AI</div>
+        </div>
+
+    </div>
+
+    <div class="dashboard-lower">
+
+        <div class="glass-card recent-card">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Prediction</h3>
+
+            {% if recent %}
+            <div class="recent-result {{ 'recent-danger' if recent['prediction']=='Heart Disease Detected' else 'recent-safe' }}">
+                <div class="recent-icon">
+                    <i class="fa-solid {{ 'fa-heart-crack' if recent['prediction']=='Heart Disease Detected' else 'fa-heart' }}"></i>
+                </div>
+                <div>
+                    <h4>{{ recent['prediction'] }}</h4>
+                    <p>Risk Level: <strong>{{ recent['risk_level'] }}</strong> &middot; Confidence: <strong>{{ recent['confidence'] }}%</strong></p>
+                    <small>{{ recent['prediction_date'] }}</small>
+                </div>
+            </div>
+            <a href="{{ url_for('history') }}" class="link-arrow">View full history <i class="fa-solid fa-arrow-right"></i></a>
+            {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <p>No predictions yet. Run your first heart health check now.</p>
+                <a href="{{ url_for('predict') }}" class="btn-gradient">Start Prediction</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="glass-card quick-links-card">
+            <h3><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
+            <a class="quick-link" href="{{ url_for('predict') }}">
+                <i class="fa-solid fa-heart-circle-check"></i> New Prediction
+            </a>
+            <a class="quick-link" href="{{ url_for('history') }}">
+                <i class="fa-solid fa-table-list"></i> Prediction History
+            </a>
+            <a class="quick-link" href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-pen"></i> Edit Profile
+            </a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Profile | CardioAI{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <div class="page-header">
+        <h1><i class="fa-solid fa-user"></i> My Profile</h1>
+        <p>Manage your account information and security settings.</p>
+    </div>
+
+    <div class="profile-grid">
+
+        <div class="glass-card profile-summary">
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <h3>{{ user['fullname'] }}</h3>
+            <p class="profile-email">{{ user['email'] }}</p>
+
+            <div class="profile-info-list">
+                <div class="profile-info-item">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>{{ user['mobile'] }}</span>
+                </div>
+                <div class="profile-info-item">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Joined {{ user['created_at'] }}</span>
+                </div>
+                <div class="profile-info-item">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    <span>{{ total_predictions }} Predictions Made</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-forms">
+
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-user-pen"></i> Edit Profile</h3>
+                <form method="POST" action="{{ url_for('edit_profile') }}" novalidate>
+                    <div class="input-box floating">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" name="fullname" id="edit_fullname" placeholder=" " value="{{ user['fullname'] }}" required>
+                        <label for="edit_fullname">Full Name</label>
+                    </div>
+                    <div class="input-box floating">
+                        <i class="fa-solid fa-phone input-icon"></i>
+                        <input type="tel" name="mobile" id="edit_mobile" placeholder=" " maxlength="10" value="{{ user['mobile'] }}" required>
+                        <label for="edit_mobile">Mobile Number</label>
+                    </div>
+                    <button type="submit" class="btn-gradient">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <div class="glass-card">
+                <h3><i class="fa-solid fa-key"></i> Change Password</h3>
+                <form method="POST" action="{{ url_for('change_password') }}" id="changePasswordForm" novalidate>
+                    <div class="input-box floating">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" name="current_password" id="current_password" placeholder=" " required>
+                        <label for="current_password">Current Password</label>
+                        <button type="button" class="toggle-password" data-target="current_password"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <div class="input-box floating">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" name="new_password" id="new_password" placeholder=" " required>
+                        <label for="new_password">New Password</label>
+                        <button type="button" class="toggle-password" data-target="new_password"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <div class="input-box floating">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" name="confirm_new_password" id="confirm_new_password" placeholder=" " required>
+                        <label for="confirm_new_password">Confirm New Password</label>
+                        <button type="button" class="toggle-password" data-target="confirm_new_password"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <button type="submit" class="btn-gradient">
+                        <i class="fa-solid fa-shield-halved"></i> Update Password
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

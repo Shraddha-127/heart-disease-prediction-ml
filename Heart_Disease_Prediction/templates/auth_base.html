@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}CardioAI{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+<body class="auth-body">
+
+<div class="auth-bg-shape shape-one"></div>
+<div class="auth-bg-shape shape-two"></div>
+<div class="auth-bg-shape shape-three"></div>
+
+<div class="auth-wrapper">
+
+    <div class="auth-brand">
+        <i class="fa-solid fa-heart-pulse pulse-icon"></i>
+        <h1>CardioAI</h1>
+        <p>Heart Disease Prediction using Explainable AI</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-wrap auth-flash">
+            {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+                <i class="fa-solid {{ 'fa-circle-check' if category=='success' else 'fa-triangle-exclamation' }}"></i>
+                <span>{{ message }}</span>
+                <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block auth_content %}{% endblock %}
+
+</div>
+
+<script src="{{ url_for('static', filename='auth.js') }}"></script>
+</body>
+</html>

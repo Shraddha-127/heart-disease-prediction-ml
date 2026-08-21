@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}History | CardioAI{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <div class="page-header">
+        <h1><i class="fa-solid fa-clock-rotate-left"></i> Prediction History</h1>
+        <p>All your past heart disease predictions in one place.</p>
+    </div>
+
+    <div class="glass-card history-card">
+
+        <div class="history-toolbar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="historySearch" placeholder="Search by prediction, risk level, date...">
+            </div>
+
+            <div class="sort-box">
+                <label for="sortSelect"><i class="fa-solid fa-arrow-down-wide-short"></i></label>
+                <select id="sortSelect">
+                    <option value="date-desc">Date (Newest)</option>
+                    <option value="date-asc">Date (Oldest)</option>
+                    <option value="confidence-desc">Confidence (High → Low)</option>
+                    <option value="confidence-asc">Confidence (Low → High)</option>
+                </select>
+            </div>
+        </div>
+
+        {% if records %}
+        <div class="table-responsive">
+            <table class="history-table" id="historyTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date &amp; Time</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Prediction</th>
+                        <th>Risk Level</th>
+                        <th>Confidence</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in records %}
+                    <tr data-date="{{ row['prediction_date'] }}" data-confidence="{{ row['confidence'] }}">
+                        <td>{{ row['id'] }}</td>
+                        <td>{{ row['prediction_date'] }}</td>
+                        <td>{{ row['age'] | int }}</td>
+                        <td>{{ 'Male' if row['sex'] in [1, '1', 1.0] else 'Female' }}</td>
+                        <td>
+                            <span class="badge {{ 'badge-danger' if row['prediction']=='Heart Disease Detected' else 'badge-success' }}">
+                                {{ row['prediction'] }}
+                            </span>
+                        </td>
+                        <td>{{ row['risk_level'] }}</td>
+                        <td>{{ row['confidence'] }}%</td>
+                        <td class="actions-cell">
+                            <a href="{{ url_for('download_report_by_id', prediction_id=row['id']) }}"
+                               class="icon-btn icon-btn-blue" title="Download PDF Again">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('delete_history_record', prediction_id=row['id']) }}"
+                                  class="inline-form" onsubmit="return confirm('Delete this prediction record?');">
+                                <button type="submit" class="icon-btn icon-btn-red" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="historyPagination"></div>
+
+        {% else %}
+        <div class="empty-state">
+            <i class="fa-solid fa-clipboard-list"></i>
+            <p>No prediction history yet.</p>
+            <a href="{{ url_for('predict') }}" class="btn-gradient">Make Your First Prediction</a>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='history.js') }}"></script>
+{% endblock %}

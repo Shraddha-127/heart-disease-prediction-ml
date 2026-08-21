@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}Prediction | CardioAI{% endblock %}
+
+{% block content %}
+<div class="page-container">
+
+    <div class="page-header">
+        <h1><i class="fa-solid fa-heart-pulse pulse-icon"></i> Heart Disease Prediction using Explainable AI</h1>
+        <p>AI-Powered Cardiovascular Risk Assessment System</p>
+    </div>
+
+    {% if error %}
+    <div class="error-box glass-card">
+        <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <div class="glass-card predict-form-card">
+
+        <form method="POST" id="predictForm" action="{{ url_for('predict') }}">
+
+            <div class="grid">
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-cake-candles"></i> Age</label>
+                    <input type="number" name="age" required min="1" max="120">
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-venus-mars"></i> Sex</label>
+                    <select name="sex" required>
+                        <option value="">Select</option>
+                        <option value="1">Male</option>
+                        <option value="0">Female</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-lungs"></i> Chest Pain Type</label>
+                    <select name="cp" required>
+                        <option value="0">Typical Angina</option>
+                        <option value="1">Atypical Angina</option>
+                        <option value="2">Non-anginal Pain</option>
+                        <option value="3">Asymptomatic</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-gauge-high"></i> Resting Blood Pressure</label>
+                    <input type="number" name="trestbps" required>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-droplet"></i> Cholesterol</label>
+                    <input type="number" name="chol" required>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-syringe"></i> Fasting Blood Sugar</label>
+                    <select name="fbs">
+                        <option value="0">&le;120</option>
+                        <option value="1">&gt;120</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-wave-square"></i> Rest ECG</label>
+                    <select name="restecg">
+                        <option value="0">Normal</option>
+                        <option value="1">ST-T Abnormality</option>
+                        <option value="2">LV Hypertrophy</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-heart-pulse"></i> Maximum Heart Rate</label>
+                    <input type="number" name="thalach" required>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-person-running"></i> Exercise Induced Angina</label>
+                    <select name="exang">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-chart-line"></i> Old Peak</label>
+                    <input type="number" step="0.1" name="oldpeak" required>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-arrow-trend-up"></i> ST Slope</label>
+                    <select name="slope">
+                        <option value="0">Upsloping</option>
+                        <option value="1">Flat</option>
+                        <option value="2">Downsloping</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-vial-circle-check"></i> Major Vessels (CA)</label>
+                    <select name="ca">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label><i class="fa-solid fa-dna"></i> Thalassemia</label>
+                    <select name="thal">
+                        <option value="0">Normal</option>
+                        <option value="1">Fixed Defect</option>
+                        <option value="2">Reversible Defect</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="button-group">
+                <button type="submit" id="predictBtn" class="btn-gradient ripple">
+                    <i class="fa-solid fa-heart-pulse"></i> Predict
+                </button>
+
+                <button type="reset" class="reset-btn ripple">
+                    <i class="fa-solid fa-rotate"></i> Reset
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="heartbeat-loader">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <svg viewBox="0 0 200 60" class="ecg-line">
+                    <polyline points="0,30 30,30 45,10 60,50 75,30 200,30" />
+                </svg>
+            </div>
+            <p class="loading-text" id="loadingText">Analyzing patient data...</p>
+        </div>
+    </div>
+
+    {% if prediction %}
+    <div class="results-wrap fade-in">
+
+        <!-- Statistics Section -->
+        <div class="stats-grid">
+            <div class="stat-card glass-card">
+                <div class="stat-icon icon-blue"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="stat-value">{{ confidence }}%</div>
+                <div class="stat-label">Confidence</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon icon-green"><i class="fa-solid fa-bullseye"></i></div>
+                <div class="stat-value">92.19%</div>
+                <div class="stat-label">Model Accuracy</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon icon-purple"><i class="fa-solid fa-robot"></i></div>
+                <div class="stat-value">Random Forest</div>
+                <div class="stat-label">Current Model</div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-icon icon-cyan"><i class="fa-solid fa-lightbulb"></i></div>
+                <div class="stat-value">SHAP</div>
+                <div class="stat-label">Explainable AI</div>
+            </div>
+        </div>
+
+        <!-- Main Result Card -->
+        <div class="glass-card result-hero {{ 'result-danger' if prediction=='Heart Disease Detected' else 'result-safe' }}">
+
+            <div class="result-hero-left">
+                <div class="result-badge-icon">
+                    <i class="fa-solid {{ 'fa-heart-crack' if prediction=='Heart Disease Detected' else 'fa-heart' }} heartbeat-icon"></i>
+                </div>
+                <h2 class="result-title">{{ prediction }}</h2>
+                <span class="risk-badge {{ 'risk-high' if risk_level=='High Risk' else 'risk-low' }}">
+                    <i class="fa-solid fa-shield-heart"></i> {{ risk_level }}
+                </span>
+            </div>
+
+            <div class="result-hero-right">
+                <div class="circular-progress" data-value="{{ confidence }}">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="circle-bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="circle-fill" cx="60" cy="60" r="52"></circle>
+                    </svg>
+                    <div class="circular-progress-text">
+                        <span class="progress-value" data-target="{{ confidence }}">0</span>%
+                        <small>Confidence</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Patient Info Cards -->
+        {% if patient %}
+        <h2 class="section-title"><i class="fa-solid fa-clipboard-user"></i> Patient Information</h2>
+        <div class="patient-grid">
+            <div class="patient-card glass-card"><i class="fa-solid fa-cake-candles"></i><span>Age</span><strong>{{ patient.age | int }}</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-venus-mars"></i><span>Gender</span><strong>{{ 'Male' if patient.sex == 1 else 'Female' }}</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-gauge-high"></i><span>Blood Pressure</span><strong>{{ patient.trestbps | int }} mmHg</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-droplet"></i><span>Cholesterol</span><strong>{{ patient.chol | int }} mg/dl</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-heart-pulse"></i><span>Max Heart Rate</span><strong>{{ patient.thalach | int }}</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-lungs"></i><span>Chest Pain Type</span><strong>{{ patient.cp | int }}</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-wave-square"></i><span>Rest ECG</span><strong>{{ patient.restecg | int }}</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-chart-line"></i><span>Old Peak</span><strong>{{ patient.oldpeak }}</strong></div>
+            <div class="patient-card glass-card"><i class="fa-solid fa-arrow-trend-up"></i><span>ST Slope</span><strong>{{ patient.slope | int }}</strong></div>
+        </div>
+        {% endif %}
+
+        <!-- SHAP Feature Importance -->
+        <h2 class="section-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Top Important Features (SHAP)</h2>
+        <div class="glass-card shap-card">
+            {% for feature, value, pct in top_features %}
+            <div class="shap-row">
+                <div class="shap-label"><i class="fa-solid fa-circle-dot"></i> {{ feature }}</div>
+                <div class="shap-bar-track">
+                    <div class="shap-bar-fill" data-pct="{{ pct }}" style="width:0%"></div>
+                </div>
+                <div class="shap-value">{{ value }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- AI Explanation -->
+        <h2 class="section-title"><i class="fa-solid fa-comment-medical"></i> AI Explanation</h2>
+        <div class="glass-card ai-chat-card">
+            <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+            <div class="ai-bubble">
+                <ul class="ai-explanation-list">
+                    {% for line in explanation %}
+                    <li class="ai-line" style="animation-delay: {{ loop.index0 * 0.25 }}s">{{ line }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <h2 class="section-title"><i class="fa-solid fa-notes-medical"></i> Recommendations</h2>
+        <div class="recommendations-grid">
+            {% for item in recommendations %}
+            <div class="glass-card recommendation-card">
+                <i class="fa-solid fa-circle-check rec-check"></i>
+                <p>{{ item }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="button-group" style="margin-top: 30px;">
+            <a href="{{ url_for('download_report') }}" class="btn-gradient download-btn ripple">
+                <i class="fa-solid fa-download"></i> Download PDF Report
+            </a>
+        </div>
+
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='predict.js') }}"></script>
+{% endblock %}

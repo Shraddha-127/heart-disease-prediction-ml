@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Prediction using Explainable AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h1>❤️ Heart Disease Prediction using Explainable AI</h1>
+    <p>AI-Powered Cardiovascular Risk Assessment System</p>
+</div>
+
+    {% if error %}
+    <div class="error-box">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+
+        <div class="grid">
+
+            <div class="input-box">
+                <label>Age</label>
+                <input type="number" name="age" required>
+            </div>
+
+            <div class="input-box">
+                <label>Sex</label>
+                <select name="sex" required>
+                    <option value="">Select</option>
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <label>Chest Pain Type</label>
+                <select name="cp" required>
+                    <option value="0">Typical Angina</option>
+                    <option value="1">Atypical Angina</option>
+                    <option value="2">Non-anginal Pain</option>
+                    <option value="3">Asymptomatic</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <label>Resting Blood Pressure</label>
+                <input type="number" name="trestbps" required>
+            </div>
+
+            <div class="input-box">
+                <label>Cholesterol</label>
+                <input type="number" name="chol" required>
+            </div>
+
+            <div class="input-box">
+                <label>Fasting Blood Sugar</label>
+                <select name="fbs">
+                    <option value="0">≤120</option>
+                    <option value="1">>120</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <label>Rest ECG</label>
+                <select name="restecg">
+                    <option value="0">Normal</option>
+                    <option value="1">ST-T Abnormality</option>
+                    <option value="2">LV Hypertrophy</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <label>Maximum Heart Rate</label>
+                <input type="number" name="thalach" required>
+            </div>
+
+            <div class="input-box">
+                <label>Exercise Induced Angina</label>
+                <select name="exang">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <label>Old Peak</label>
+                <input type="number" step="0.1" name="oldpeak" required>
+            </div>
+
+            <div class="input-box">
+                <label>ST Slope</label>
+                <select name="slope">
+                    <option value="0">Upsloping</option>
+                    <option value="1">Flat</option>
+                    <option value="2">Downsloping</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <label>Major Vessels (CA)</label>
+                <select name="ca">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <label>Thalassemia</label>
+                <select name="thal">
+                    <option value="0">Normal</option>
+                    <option value="1">Fixed Defect</option>
+                    <option value="2">Reversible Defect</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="button-group">
+            <button type="submit">
+                <i class="fa-solid fa-heart-pulse"></i>
+                Predict
+            </button>
+
+            <button type="reset" class="reset-btn">
+                <i class="fa-solid fa-rotate"></i>
+                Reset
+            </button>
+        </div>
+
+    </form>
+
+    {% if prediction %}
+    <div class="dashboard">
+
+    <div class="card">
+        <h3>❤️ Prediction</h3>
+        <p>{{ prediction }}</p>
+    </div>
+
+    <div class="card">
+        <h3>⚠ Risk Level</h3>
+        <p>{{ risk_level }}</p>
+    </div>
+
+    <div class="card">
+        <h3>📈 Confidence</h3>
+        <p>{{ confidence }}%</p>
+    </div>
+
+    <div class="card">
+        <h3>🤖 AI</h3>
+        <p>Explainable AI</p>
+    </div>
+
+</div>
+
+    <div class="result-card">
+
+       <h2 style="font-size:32px;color:#0d47a1;">
+Prediction Result
+</h2>
+
+{% if prediction=="Heart Disease Detected" %}
+
+<div class="danger-card">
+
+<h2>❤️ Heart Disease Detected</h2>
+
+<h3>Risk Level : {{risk_level}}</h3>
+
+<h3>Confidence : {{confidence}}%</h3>
+
+</div>
+
+{% else %}
+
+<div class="safe-card">
+
+<h2>💚 No Heart Disease Detected</h2>
+
+<h3>Risk Level : {{risk_level}}</h3>
+
+<h3>Confidence : {{confidence}}%</h3>
+
+</div>
+
+{% endif %}
+
+
+        <h2 class="section-title">AI Explanation</h2>
+
+        <ul>
+            {% for line in explanation %}
+                <li>{{ line }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Top Important Features</h2>
+
+        <table>
+
+            <tr>
+                <th>Feature</th>
+                <th>Importance</th>
+            </tr>
+
+            {% for feature, value in top_features %}
+            <tr>
+                <td>{{ feature }}</td>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+
+        <h2>Recommendations</h2>
+
+        <ul>
+            {% for item in recommendations %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+
+        <br>
+
+        <a href="{{ url_for('download_report') }}" class="download-btn">
+            <i class="fa-solid fa-download"></i>
+            Download PDF Report
+        </a>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

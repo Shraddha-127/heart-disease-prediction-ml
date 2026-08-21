@@ -1,0 +1,66 @@
+{% extends "auth_base.html" %}
+{% block title %}Register | CardioAI{% endblock %}
+
+{% block auth_content %}
+<div class="glass-card auth-card">
+
+    <h2 class="auth-title">Create Account</h2>
+    <p class="auth-subtitle">Join CardioAI to start tracking your heart health</p>
+
+    <form method="POST" action="{{ url_for('register') }}" id="registerForm" novalidate>
+
+        <div class="input-box floating">
+            <i class="fa-solid fa-user input-icon"></i>
+            <input type="text" name="fullname" id="fullname" placeholder=" " required>
+            <label for="fullname">Full Name</label>
+        </div>
+
+        <div class="input-box floating">
+            <i class="fa-solid fa-envelope input-icon"></i>
+            <input type="email" name="email" id="reg_email" placeholder=" " required>
+            <label for="reg_email">Email Address</label>
+        </div>
+
+        <div class="input-box floating">
+            <i class="fa-solid fa-phone input-icon"></i>
+            <input type="tel" name="mobile" id="mobile" placeholder=" " maxlength="10" required>
+            <label for="mobile">Mobile Number</label>
+        </div>
+
+        <div class="input-box floating">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" name="password" id="reg_password" placeholder=" " required>
+            <label for="reg_password">Password</label>
+            <button type="button" class="toggle-password" data-target="reg_password" aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+            </button>
+        </div>
+
+        <div class="password-strength" id="passwordStrength">
+            <div class="strength-bar"><span id="strengthFill"></span></div>
+            <small id="strengthText">Password strength</small>
+        </div>
+
+        <div class="input-box floating">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder=" " required>
+            <label for="confirm_password">Confirm Password</label>
+            <button type="button" class="toggle-password" data-target="confirm_password" aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+            </button>
+        </div>
+        <small class="field-error" id="matchError"></small>
+
+        <button type="submit" class="btn-gradient btn-block">
+            <i class="fa-solid fa-user-plus"></i> Create Account
+        </button>
+
+    </form>
+
+    <p class="auth-switch">
+        Already have an account?
+        <a href="{{ url_for('login_page') }}">Login here</a>
+    </p>
+
+</div>
+{% endblock %}

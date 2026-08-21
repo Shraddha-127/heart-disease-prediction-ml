@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}CardioAI | Heart Disease Prediction{% endblock %}</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+{% block extra_head %}{% endblock %}
+</head>
+<body class="app-body">
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a class="nav-logo" href="{{ url_for('dashboard') }}">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>CardioAI</span>
+        </a>
+
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.path == url_for('dashboard') else '' }}">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+            <a href="{{ url_for('predict') }}" class="{{ 'active' if request.path == url_for('predict') else '' }}">
+                <i class="fa-solid fa-heart-circle-check"></i> Prediction
+            </a>
+            <a href="{{ url_for('history') }}" class="{{ 'active' if request.path == url_for('history') else '' }}">
+                <i class="fa-solid fa-clock-rotate-left"></i> History
+            </a>
+            <a href="{{ url_for('profile') }}" class="{{ 'active' if request.path == url_for('profile') else '' }}">
+                <i class="fa-solid fa-user"></i> Profile
+            </a>
+            <a href="{{ url_for('logout') }}" class="nav-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </div>
+</nav>
+
+<main class="app-main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-wrap">
+            {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+                <i class="fa-solid {{ 'fa-circle-check' if category=='success' else 'fa-triangle-exclamation' }}"></i>
+                <span>{{ message }}</span>
+                <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="app-footer">
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h4><i class="fa-solid fa-heart-pulse"></i> CardioAI Diagnostics</h4>
+            <p>Heart Disease Prediction using Explainable AI — a smart clinical decision support system.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Team</h4>
+            <p>Final Year Engineering Project</p>
+            <p>Department of Computer Science</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        &copy; {{ 2026 }} CardioAI Diagnostics. All rights reserved.
+    </div>
+</footer>
+
+<!-- =====================================================
+     AI Health Chatbot Widget (Ollama / Llama 3)
+     Available on every logged-in page since it lives in
+     base.html - floats above the page independent of
+     .app-main so it stays accessible while scrolling.
+===================================================== -->
+<div id="chatbotWidget" class="chatbot-widget">
+
+    <button id="chatbotToggleBtn" class="chatbot-toggle-btn" type="button"
+            title="Chat with CardioAI Assistant">
+        <i class="fa-solid fa-comment-medical"></i>
+    </button>
+
+    <div id="chatbotPanel" class="chatbot-panel">
+
+        <div class="chatbot-header">
+            <div class="chatbot-header-title">
+                <i class="fa-solid fa-robot"></i>
+                CardioAI Health Assistant
+            </div>
+            <button id="chatbotCloseBtn" class="chatbot-close-btn" type="button" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div id="chatbotStatus" class="chatbot-status"></div>
+
+        <div id="chatbotMessages" class="chatbot-messages">
+            <div class="chatbot-msg chatbot-msg-bot">
+                Hi! I'm your CardioAI health assistant. I can answer general heart-health
+                questions and help explain your prediction result in plain language.
+                I don't diagnose conditions or prescribe medication &mdash; for medical
+                decisions, please consult a healthcare professional.
+            </div>
+        </div>
+
+        {% if has_recent_prediction %}
+        <div class="chatbot-quick-actions">
+            <button type="button" class="chatbot-quick-btn" id="chatbotExplainBtn">
+                <i class="fa-solid fa-circle-info"></i>
+                Explain my latest result
+            </button>
+        </div>
+        {% endif %}
+
+        <form id="chatbotForm" class="chatbot-input-row">
+            <input type="text" id="chatbotInput" placeholder="Ask about heart health..." autocomplete="off">
+            <button type="submit" id="chatbotSendBtn" title="Send">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
